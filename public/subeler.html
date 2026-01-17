@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDS | Şube Performans & Sağlık Analizi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f1f5f9; color: #0f172a; font-family: 'Inter', sans-serif; letter-spacing: -0.01em; }
+        .brand-red { background-color: #be123c; } 
+        .sidebar-link { color: #94a3b8; transition: all 0.2s; }
+        .sidebar-link:hover { color: white; background-color: rgba(255,255,255,0.05); }
+        .sidebar-active { color: #be123c !important; font-weight: 700; background-color: rgba(190, 18, 60, 0.1); border-right: 3px solid #be123c; }
+        .stat-card { background: white; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-[#1e293b] flex flex-col flex-shrink-0 shadow-2xl z-50">
+        <div class="p-6 border-b border-slate-700 bg-[#0f172a]">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 brand-red rounded flex items-center justify-center text-white"><i class="fa-solid fa-chart-pie"></i></div>
+                <h1 class="text-white font-bold text-lg tracking-tight">Kırmızı Kedi Kitabevi KDS</h1>
+            </div>
+        </div>
+        
+        <nav class="flex-1 mt-6 px-4 space-y-1 overflow-y-auto">
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 mt-2 italic">Mevcut Varlıklar</p>
+            <a href="subeler.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link sidebar-active">
+                <i class="fa-solid fa-store w-5 text-center"></i> Şubelerim
+            </a>
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 mt-6 italic">Büyüme Analizi</p>
+            <a href="LokasyonAnalizi.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link">
+                <i class="fa-solid fa-location-crosshairs w-5 text-center"></i> Lokasyon Analizi
+            </a>
+            <a href="talep.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link">
+                <i class="fa-solid fa-arrow-trend-up w-5 text-center"></i> Talep Analizi
+            </a>
+            <a href="pazarlama.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link">
+                <i class="fa-solid fa-bullseye w-5 text-center"></i> Pazarlama Stratejisi
+            </a>
+            <a href="envanter.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link">
+                <i class="fa-solid fa-warehouse w-5 text-center"></i> Envanter Yönetimi
+            </a>
+            
+        </nav>
+        
+        <div class="p-4 bg-[#0f172a] border-t border-slate-700">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white text-xs font-bold">YO</div>
+                <div>
+                    <p class="text-xs text-white font-bold">Yönetici Oturumu</p>
+                    <p class="text-[10px] text-slate-400">Veritabanı: Online</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+<main class="flex-1 overflow-y-auto p-8 bg-[#f8fafc]">
+        
+        <header class="mb-6 flex justify-between items-end border-b border-slate-200 pb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800">Şube Performans Kokpiti</h2>
+                <p class="text-sm text-slate-500 mt-1">Veritabanı tablosu: <span class="font-mono text-xs bg-slate-200 px-1 rounded">talep_tahmin_verisi</span></p>
+            </div>
+            <div class="flex flex-col">
+                <label class="text-[10px] font-bold text-slate-500 uppercase mb-1">ANALİZ EDİLEN ŞUBE</label>
+                <select id="activeBranch" class="w-64 bg-white border border-slate-300 text-sm font-bold py-2 px-3 rounded shadow-sm focus:outline-none focus:border-brand-red">
+                 <option selected disabled>Bir Şube Seçiniz...</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-2 bg-white rounded-lg border border-slate-200 shadow-sm p-4">
+                <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
+                    <h5 class="text-sm font-bold text-slate-800 uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-chart-scatter text-brand-red"></i> Stratejik Konumlandırma
+                    </h5>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Ciro vs Kârlılık Analizi</span>
+                </div>
+                <div class="h-[300px]">
+                    <canvas id="strategyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+                <div class="p-4 border-b border-slate-100 bg-slate-50">
+                    <h5 class="text-sm font-bold text-slate-800 uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-list-ul text-slate-600"></i> Tüm Şubeler
+                    </h5>
+                </div>
+                <div class="flex-1 overflow-y-auto max-h-[300px]">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-white sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="p-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50">Şube</th>
+                                <th class="p-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 text-right">Skor</th>
+                                <th class="p-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50 text-center">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="branchTableBody" class="divide-y divide-slate-100 text-xs font-medium text-slate-700">
+                            <tr><td colspan="3" class="p-4 text-center text-slate-400">Veriler yükleniyor...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 pl-1">Seçili Şube Detayları</h3>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card p-4 border-l-4 border-slate-800 bg-white shadow-sm rounded-r-lg">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tahmini Yıllık Ciro</p>
+                <h3 id="kpiCiro" class="text-2xl font-bold text-slate-900 mt-1">-</h3>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-emerald-500 bg-white shadow-sm rounded-r-lg">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Net Kar Marjı</p>
+                <h3 id="kpiKar" class="text-2xl font-bold text-emerald-600 mt-1">-</h3>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-blue-500 bg-white shadow-sm rounded-r-lg">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Trend Kategori</p>
+                <h3 id="kpiKategori" class="text-lg font-bold text-slate-900 mt-2">-</h3>
+            </div>
+            <div class="stat-card p-4 border-l-4 border-brand-red bg-white shadow-sm rounded-r-lg">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">AI Güven Skoru</p>
+                <h3 id="kpiSkor" class="text-2xl font-bold text-brand-red mt-1">-</h3>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="lg:col-span-2 stat-card p-6 bg-white shadow-sm rounded-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-sm font-bold text-slate-800 uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-brand-red"></i> Satış Performansı (Gerçekleşen vs Tahmin)
+                    </h4>
+                    <div class="flex gap-4 text-[10px] font-bold uppercase">
+                        <span class="flex items-center gap-1"><div class="w-4 h-1 bg-[#be123c]"></div> Geçmiş (6 Ay)</span>
+                        <span class="flex items-center gap-1 text-slate-400"><div class="w-4 h-1 border-t-2 border-dashed border-[#be123c]"></div> Gelecek (6 Ay)</span>
+                    </div>
+                </div>
+                <div class="h-[250px]"><canvas id="satisGrafigi"></canvas></div>
+            </div>
+
+            <div class="stat-card p-0 flex flex-col border-t-4 border-emerald-500 overflow-hidden relative bg-white shadow-sm rounded-lg">
+                <div class="p-4 bg-slate-50 border-b flex justify-between items-center">
+                    <h4 class="text-xs font-bold text-slate-800 uppercase tracking-widest">Şube Sağlık Karnesi</h4>
+                    <span id="healthBadge" class="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded border border-emerald-200">YÜKLENİYOR</span>
+                </div>
+                
+                <div class="p-6 flex-1 flex flex-col items-center justify-center">
+                    <div class="relative h-32 w-48 mb-2 flex items-center justify-center">
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="healthScore" class="text-5xl font-black text-slate-800">-</span>
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Genel Puan</span>
+                        </div>
+                    </div>
+                    <p id="healthMsg" class="text-xs text-center text-slate-500 font-medium px-4">
+                        Şube verileri analiz ediliyor, lütfen bekleyiniz...
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="lg:col-span-2 stat-card p-6 border-t-4 border-slate-600 bg-white shadow-sm rounded-lg">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <h4 class="text-sm font-bold text-slate-800 uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-scale-balanced text-slate-600"></i> Şube Ciro Karşılaştırma
+                    </h4>
+                    <div class="flex gap-4">
+                        <div class="flex flex-col">
+                            <label class="text-[9px] font-bold text-slate-400 uppercase">ŞUBE 1</label>
+                            <select id="compareA" class="bg-slate-100 border text-xs font-bold py-1 px-2 rounded outline-none"></select>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-[9px] font-bold text-slate-400 uppercase">ŞUBE 2</label>
+                            <select id="compareB" class="bg-slate-100 border text-xs font-bold py-1 px-2 rounded outline-none"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="comparison-insight"></div> 
+                <div class="h-[250px]">
+                    <canvas id="comparisonLineChart"></canvas>
+                </div>
+            </div>
+
+            <div class="stat-card p-0 flex flex-col border-t-4 border-brand-red overflow-hidden relative h-[340px] bg-white shadow-sm rounded-lg">
+                <div class="p-4 bg-slate-900 text-white flex justify-between items-center shrink-0">
+                    <h4 class="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-brand-red"></i> Strateji Motoru
+                    </h4>
+                    <span id="simStatus" class="px-2 py-1 bg-white/10 text-[10px] font-bold rounded">AI AKTİF</span>
+                </div>
+                
+                <div class="p-4 flex-1 overflow-y-auto no-scrollbar bg-slate-50 flex flex-col gap-3">
+                    <p class="text-[9px] text-slate-500 font-bold uppercase">AI ANALİZ ÖNERİSİ</p>
+                    <div class="bg-white p-4 rounded border shadow-sm border-l-4 border-brand-red">
+                        <p id="aiTavsiye" class="text-sm italic font-medium text-slate-700">
+                            Şube seçildiğinde stratejik öneriler burada görünecektir.
+                        </p>
+                    </div>
+                    
+                    <p class="text-[9px] text-slate-500 font-bold uppercase mt-2">Hızlı Simülasyonlar</p>
+                    <div class="flex flex-col gap-2">
+                        <div id="sim-report" class="hidden mb-4 p-3 bg-brand-red/5 border-l-4 border-brand-red rounded shadow-sm">
+                            <p class="text-[11px] font-bold text-brand-red uppercase mb-1">Simülasyon Analizi</p>
+                            <p id="sim-text" class="text-xs text-slate-700 italic font-medium leading-relaxed"></p>
+                        </div>
+                        <div id="sim-promo" onclick="toggleSim('promo')" class="flex items-center justify-between bg-white p-2 rounded border shadow-sm cursor-pointer hover:border-brand-red transition group">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-emerald-100 text-emerald-600 flex items-center justify-center"><i class="fa-solid fa-percent text-xs"></i></div>
+                                <h5 class="text-xs font-bold text-slate-800">Kampanya Artır</h5>
+                            </div>
+                            <div id="dot-promo" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                        </div>
+                        <div id="sim-student" onclick="toggleSim('student')" class="flex items-center justify-between bg-white p-2 rounded border shadow-sm cursor-pointer hover:border-brand-red transition group">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-graduation-cap text-xs"></i></div>
+                                <h5 class="text-xs font-bold text-slate-800">Öğrenci İndirimi</h5>
+                            </div>
+                            <div id="dot-student" class="w-2 h-2 rounded-full bg-slate-200"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white border-t shrink-0 flex justify-between items-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Veri Durumu</p>
+                    <h4 class="text-sm font-black text-emerald-500">CANLI</h4>
+                </div>
+            </div>
+        </div>
+    </main>
+
+<script>
+    let myChart = null; 
+    let compareChart = null;
+    let strategyChartInstance = null;
+    let simStates = { promo: false, student: false };
+    let originalForecast = []; 
+
+    document.addEventListener('DOMContentLoaded', () => {
+        genelBakisiYukle();
+
+        const selectKutusu = document.getElementById('activeBranch');
+        if(selectKutusu) {
+            fetch('/api/subeler')
+                .then(res => res.json())
+                .then(data => {
+                    selectKutusu.innerHTML = '<option selected disabled>Bir Şube Seçiniz...</option>';
+                    data.forEach(sube => {
+                        const option = document.createElement('option');
+                        option.value = sube.sube_id;
+                        option.textContent = sube.sube_adi;
+                        selectKutusu.appendChild(option);
+                    });
+                })
+                .catch(err => console.error("Dropdown Hatası:", err));
+
+            selectKutusu.addEventListener('change', (e) => {
+                const secilenId = e.target.value;
+                kartlariVeAnaliziGetir(secilenId);
+                grafigiCiz(secilenId);
+                simStates = { promo: false, student: false };
+                updateSimUI();
+            });
+        }
+        
+        karsilastirmaListeleriniDoldur();
+        
+        const cmpA = document.getElementById('compareA');
+        const cmpB = document.getElementById('compareB');
+        if(cmpA) cmpA.addEventListener('change', karsilastirmayiCiz);
+        if(cmpB) cmpB.addEventListener('change', karsilastirmayiCiz);
+    });
+
+    function genelBakisiYukle() {
+        fetch('/api/tum-subeler-ozet')
+            .then(res => res.json())
+            .then(data => {
+                if (!data || data.length === 0) return;
+
+                const islenmisVeri = data.map(item => {
+                    let hamCiro = item.tahmini_ciro ? item.tahmini_ciro.toString() : "0";
+                    let temizCiro = parseFloat(hamCiro.replace(/\./g, '').replace(/[^0-9]/g, '')) || 0;
+
+                    let hamKar = item.net_kar ? item.net_kar.toString() : "0";
+                    let temizKar = parseFloat(hamKar.replace(/[^0-9.]/g, '')) || 0; 
+                    if(temizKar < 1000 && hamKar.includes('.')) { 
+                         temizKar = parseFloat(hamKar.replace(/\./g, '').replace(/[^0-9]/g, '')) || 0;
+                    }
+
+                    let marj = 0;
+                    if(temizCiro > 0) marj = (temizKar / temizCiro) * 100;
+
+                    let hamSkor = parseFloat(item.performans_skoru || 0);
+                    let finalSkor = hamSkor;
+                    if (hamSkor > 100) finalSkor = hamSkor / 100;
+                    else if (hamSkor > 10) finalSkor = 10;
+                    if (finalSkor > 10) finalSkor = 10;
+
+                    let durum = 'low';
+                    if (finalSkor >= 7.5) durum = 'high';
+                    else if (finalSkor >= 5.0) durum = 'mid';
+
+                    return {
+                        id: item.sube_id,
+                        ad: item.sube_adi,
+                        ciro: temizCiro,
+                        karTL: temizKar,
+                        marj: marj.toFixed(1),
+                        skor: finalSkor.toFixed(1),
+                        durum: durum
+                    };
+                });
+
+                tabloyuCiz(islenmisVeri);
+                grafigiCizMatris(islenmisVeri);
+            })
+            .catch(err => console.error("Genel Bakış Hatası:", err));
+    }
+
+    function tabloyuCiz(veriler) {
+        const tbody = document.getElementById('branchTableBody');
+        if(!tbody) return;
+        tbody.innerHTML = "";
+        veriler.sort((a, b) => b.skor - a.skor);
+
+        veriler.forEach(sube => {
+            let badgeClass = sube.durum === 'high' ? 'bg-emerald-100 text-emerald-700' : 
+                             (sube.durum === 'mid' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700');
+            let durumText = sube.durum === 'high' ? 'İYİ' : (sube.durum === 'mid' ? 'ORTA' : 'RİSKLİ');
+            
+            let row = `
+                <tr class="hover:bg-slate-50 transition cursor-pointer border-b border-slate-50 last:border-0"
+                    onclick="branchClickTrigger('${sube.id}')">
+                    <td class="p-3 font-bold text-slate-700 text-xs">${sube.ad}</td>
+                    <td class="p-3 text-right font-mono text-slate-600 text-xs">${sube.skor} / 10</td>
+                    <td class="p-3 text-center">
+                        <span class="text-[9px] font-bold px-2 py-1 rounded ${badgeClass}">${durumText}</span>
+                    </td>
+                </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function grafigiCizMatris(veriler) {
+        const ctx = document.getElementById('strategyChart');
+        if(!ctx) return;
+        if(strategyChartInstance) strategyChartInstance.destroy();
+
+        const bgColors = veriler.map(s => s.durum === 'high' ? 'rgba(16, 185, 129, 0.5)' : s.durum === 'mid' ? 'rgba(245, 158, 11, 0.5)' : 'rgba(239, 68, 68, 0.5)');
+        const borderColors = veriler.map(s => s.durum === 'high' ? '#047857' : s.durum === 'mid' ? '#b45309' : '#b91c1c');
+
+        const minCiro = Math.min(...veriler.map(v => v.ciro));
+        const safeMin = minCiro > 0 ? minCiro / 2 : 1000; 
+
+        strategyChartInstance = new Chart(ctx, {
+            type: 'bubble',
+            data: {
+                datasets: [{
+                    label: 'Şubeler',
+                    data: veriler.map(s => ({ 
+                        x: s.ciro, 
+                        y: parseFloat(s.marj), 
+                        r: Math.max(5, Math.min(parseFloat(s.skor) * 1.5, 15)) 
+                    })),
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1,
+                    hoverRadius: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'xy',
+                    intersect: false
+                },
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#475569',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                const sube = veriler[context.dataIndex];
+                                let ciroFmt = (sube.ciro / 1000).toFixed(0) + 'k';
+                                if(sube.ciro > 1000000) ciroFmt = (sube.ciro / 1000000).toFixed(1) + 'M';
+                                return `${sube.ad}: ${ciroFmt} Ciro | %${sube.marj} Marj`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { 
+                        type: 'logarithmic',
+                        title: { display: true, text: 'Yıllık Ciro (Logaritmik Ölçek)', font: {size: 10} },
+                        min: safeMin, 
+                        grid: { color: '#f1f5f9' },
+                        ticks: {
+                            callback: function(value, index, values) {
+                                if(value === 10000) return '10k';
+                                if(value === 100000) return '100k';
+                                if(value === 1000000) return '1M';
+                                if(value === 10000000) return '10M';
+                                return null; 
+                            }
+                        }
+                    },
+                    y: { 
+                        title: { display: true, text: 'Net Kar Marjı (%)', font: {size: 10} },
+                        beginAtZero: true 
+                    }
+                },
+                onClick: (e) => {
+                    const points = strategyChartInstance.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+                    if (points.length) branchClickTrigger(veriler[points[0].index].id);
+                }
+            }
+        });
+    }
+
+    function branchClickTrigger(id) {
+        const selectBox = document.getElementById('activeBranch');
+        if(selectBox) {
+            selectBox.value = id;
+            selectBox.dispatchEvent(new Event('change'));
+        }
+    }
+
+    function kartlariVeAnaliziGetir(id) {
+        fetch(`/api/sube-analiz/${id}`).then(r=>r.json()).then(veri => {
+            if(veri.mesaj) return;
+            document.getElementById('kpiCiro').innerHTML = `${veri.ciro} <span class="text-xs text-emerald-500">▲</span>`;
+            document.getElementById('kpiKar').innerText = `${veri.kar_marji}`; 
+            document.getElementById('kpiKategori').innerText = veri.trend || "-";
+            
+            let hamSkor = parseFloat(veri.skor || 0);
+            if(hamSkor > 100) hamSkor = (hamSkor/100).toFixed(1);
+            else if(hamSkor > 10) hamSkor = 10;
+            document.getElementById('kpiSkor').innerText = hamSkor + "/10";
+            
+            document.getElementById('healthScore').innerText = veri.saglik_puan || 0;
+            document.getElementById('aiTavsiye').innerText = veri.tavsiye || "Analiz yok.";
+            
+            const badge = document.getElementById('healthBadge');
+            if(badge) {
+                badge.innerText = veri.saglik_durum || "-";
+                badge.className = `px-2 py-1 text-xs font-bold rounded border ${veri.renk_kodu === 'text-emerald-500' ? 'bg-emerald-100 text-emerald-600 border-emerald-200' : 'bg-red-100 text-red-600 border-red-200'}`;
+            }
+        });
+    }
+
+    function grafigiCiz(id) {
+        originalForecast = [];
+        simStates = { promo: false, student: false };
+        fetch(`/api/satis-grafik/${id}`).then(r=>r.json()).then(data => {
+            const ctx = document.getElementById('satisGrafigi').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        { label: 'Gerçek', data: data.gecmis, borderColor: '#be123c', fill:true, backgroundColor:'rgba(190,18,60,0.1)' },
+                        { label: 'Tahmin', data: data.gelecek, borderColor: '#be123c', borderDash:[5,5], fill:false }
+                    ]
+                },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}} }
+            });
+        });
+    }
+
+    function karsilastirmaListeleriniDoldur() {
+        const selA = document.getElementById('compareA');
+        const selB = document.getElementById('compareB');
+        if(!selA || !selB) return;
+
+        fetch('/api/subeler').then(r=>r.json()).then(data => {
+            selA.innerHTML = ''; selB.innerHTML = '';
+            data.forEach(sube => {
+                selA.add(new Option(sube.sube_adi, sube.sube_id));
+                selB.add(new Option(sube.sube_adi, sube.sube_id));
+            });
+            if(data.length > 1) selB.selectedIndex = 1;
+            karsilastirmayiCiz();
+        });
+    }
+
+    function karsilastirmayiCiz() {
+        const id1 = document.getElementById('compareA').value;
+        const id2 = document.getElementById('compareB').value;
+        
+        fetch(`/api/karsilastir/${id1}/${id2}`).then(r=>r.json()).then(data => {
+            const ctx = document.getElementById('comparisonLineChart').getContext('2d');
+            if(compareChart) compareChart.destroy();
+            compareChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        { label: 'Şube 1', data: data.data1, borderColor: '#be123c', fill:false },
+                        { label: 'Şube 2', data: data.data2, borderColor: '#94a3b8', fill:false }
+                    ]
+                },
+                options: { responsive:true, maintainAspectRatio:false }
+            });
+            
+            const totalA = data.data1.reduce((a,b)=>a+parseFloat(b||0),0);
+            const totalB = data.data2.reduce((a,b)=>a+parseFloat(b||0),0);
+            const box = document.getElementById('comparison-insight');
+            if(box) {
+                const diff = totalB > 0 ? Math.round(((totalA-totalB)/totalB)*100) : 0;
+                box.innerHTML = `<div class="text-xs p-2 bg-slate-100 rounded">Şube 1, Şube 2'ye göre <strong>%${diff}</strong> farkla performans gösteriyor.</div>`;
+            }
+        });
+    }
+
+    function toggleSim(type) {
+        simStates[type] = !simStates[type];
+        updateSimUI();
+        applySimToChart();
+    }
+
+    function updateSimUI() {
+        ['promo', 'student'].forEach(type => {
+            const dot = document.getElementById(`dot-${type}`);
+            const box = document.getElementById(`sim-${type}`);
+            if(dot && box) {
+                if(simStates[type]) {
+                    dot.style.backgroundColor = '#be123c'; 
+                    box.style.borderColor = '#be123c';
+                    box.style.backgroundColor = '#fff1f2';
+                } else {
+                    dot.style.backgroundColor = '#e2e8f0'; 
+                    box.style.borderColor = '#e2e8f0';
+                    box.style.backgroundColor = '#ffffff';
+                }
+            }
+        });
+    }
+
+    function applySimToChart() {
+        if (!myChart || !myChart.data.datasets[1]) return;
+        if (originalForecast.length === 0) originalForecast = [...myChart.data.datasets[1].data];
+        
+        let multiplier = 1.0;
+        let explanation = "";
+
+        if (simStates.promo && simStates.student) {
+            multiplier = 1.25; explanation = "Agresif Büyüme: %25 Artış.";
+        } else if (simStates.promo) {
+            multiplier = 1.15; explanation = "Kampanya Etkisi: %15 Artış.";
+        } else if (simStates.student) {
+            multiplier = 1.10; explanation = "Öğrenci Trafiği: %10 Artış.";
+        }
+
+        const newData = originalForecast.map(val => val ? Math.round(val * multiplier) : null);
+        myChart.data.datasets[1].data = newData;
+        myChart.update('none'); 
+
+        const reportBox = document.getElementById('sim-report');
+        const simText = document.getElementById('sim-text');
+        if(reportBox && simText) {
+            if (multiplier > 1) { reportBox.classList.remove('hidden'); simText.innerHTML = explanation; } 
+            else { reportBox.classList.add('hidden'); }
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDS | Stratejik Envanter Yönetimi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f8fafc; color: #0f172a; font-family: 'Inter', sans-serif; }
+        .brand-red { background-color: #be123c; } 
+        .sidebar-active { background-color: rgba(190, 18, 60, 0.1); border-right: 3px solid #be123c; color: #be123c !important; font-weight: 700; }
+        .stat-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1); }
+        
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #be123c; cursor: pointer; margin-top: -6px; box-shadow: 0 0 0 3px rgba(190, 18, 60, 0.2); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #cbd5e1; border-radius: 2px; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-[#1e293b] flex flex-col flex-shrink-0 shadow-2xl z-50">
+        <div class="p-6 border-b border-slate-700 bg-[#0f172a]">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 brand-red rounded flex items-center justify-center text-white"><i class="fa-solid fa-cat"></i></div>
+                <h1 class="text-white font-bold text-lg tracking-tight">KIRMIZI KEDİ</h1>
+            </div>
+        </div>
+        <nav class="flex-1 mt-6 px-4 space-y-2 overflow-y-auto text-sm">
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 mt-4">Analiz Modülleri</p>
+            <a href="subeler.html" class="flex items-center gap-3 px-3 py-3 rounded text-slate-400 hover:text-white hover:bg-slate-700 transition"><i class="fa-solid fa-store w-5 text-center"></i> Şubelerim</a>
+            <a href="lokasyon.html" class="flex items-center gap-3 px-3 py-3 rounded text-slate-400 hover:text-white hover:bg-slate-700 transition"><i class="fa-solid fa-map-location-dot w-5 text-center"></i> Lokasyon Analizi</a>
+            <a href="talep.html" class="flex items-center gap-3 px-3 py-3 rounded text-slate-400 hover:text-white hover:bg-slate-700 transition"><i class="fa-solid fa-chart-line w-5 text-center"></i> Talep Analizi</a>
+            <a href="pazarlama.html" class="flex items-center gap-3 px-3 py-3 rounded text-slate-400 hover:text-white hover:bg-slate-700 transition"><i class="fa-solid fa-chart-line w-5 text-center"></i> Pazarlama Stratejisi</a>
+            <a href="envanter.html" class="flex items-center gap-3 px-3 py-3 rounded sidebar-active"><i class="fa-solid fa-boxes-stacked w-5 text-center"></i> Envanter Yönetimi</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8 bg-slate-50">
+        
+        <header class="flex justify-between items-end mb-6 border-b border-slate-200 pb-4">
+            <div>
+                <h2 class="text-2xl font-extrabold text-slate-800">Envanter Karar Destek Kokpiti</h2>
+                <p class="text-sm text-slate-500 mt-1">Stok optimizasyonu, Trigger alarmları ve What-If analizi.</p>
+            </div>
+            
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm w-64">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Pazar Senaryosu</span>
+                    <span id="scenarioValue" class="text-xs font-bold text-blue-600">%0 (Normal)</span>
+                </div>
+                <input type="range" id="whatIfSlider" min="-50" max="50" step="10" value="0"
+                oninput="updateScenario(this.value)">
+                
+                <p class="text-[8px] text-slate-400 mt-1 text-center">Talep Artış/Azalış Simülasyonu</p>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card p-5 border-l-4 border-l-emerald-500">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Mevcut Envanter Değeri</span>
+                <div class="text-2xl font-black text-slate-800 mt-1" id="kpi-total-value">...</div>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-blue-500">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">6 Aylık Bütçe İhtiyacı</span>
+                <div class="text-2xl font-black text-blue-600 mt-1" id="kpi-budget-need">...</div>
+                <p class="text-[10px] text-slate-400 mt-1">Senaryoya göre değişir</p>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-orange-500">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Stratejik Ürünler</span>
+                <div class="text-2xl font-black text-orange-500 mt-1" id="kpi-strategic-count">...</div>
+                <p class="text-[10px] text-orange-400 mt-1">Planlama gerektiren</p>
+            </div>
+            <div class="stat-card p-5 border-l-4 border-l-purple-500">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Alarm (Trigger)</span>
+                <div class="text-2xl font-black text-purple-600 mt-1" id="kpi-trigger-status">Aktif</div>
+                <p class="text-[10px] text-purple-400 mt-1">MySQL Stok Kontrolü</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="stat-card p-5">
+                <h4 class="text-xs font-bold text-slate-600 uppercase mb-4">📦 ABC Analizi (Senaryolu)</h4>
+                <div class="h-40"><canvas id="chartABC"></canvas></div>
+            </div>
+            <div class="stat-card p-5">
+                <h4 class="text-xs font-bold text-slate-600 uppercase mb-4">⏳ Raf Ömrü Riskleri</h4>
+                <div class="h-40"><canvas id="chartShelfLife"></canvas></div>
+            </div>
+            <div class="stat-card p-5">
+                <h4 class="text-xs font-bold text-slate-600 uppercase mb-4">📚 Kategori Dağılımı</h4>
+                <div class="h-40"><canvas id="chartCategories"></canvas></div>
+            </div>
+        </div>
+
+        <div class="stat-card p-6">
+            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-robot text-brand-red"></i> Yapay Zeka Aksiyon Planı (6-12 Ay)
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-500">
+                    <thead class="text-xs text-slate-700 uppercase bg-slate-50 border-b">
+                        <tr>
+                            <th class="px-4 py-3">Kitap / Kategori</th>
+                            <th class="px-4 py-3">Mevcut Varlık</th>
+                            <th class="px-4 py-3">Gelecek Tahmini (Simülasyon)</th>
+                            <th class="px-4 py-3">Strateji</th>
+                            <th class="px-4 py-3 text-right">KDS Kararı</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-table-body">
+                        <tr><td colspan="5" class="text-center py-4">Veri yükleniyor...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        var globalABCChart;
+        var globalRiskChart;
+        var globalCategoryChart;
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            let globalData = []; 
+
+            fetch('/api/envanter')
+                .then(res => res.json())
+                .then(data => {
+                    globalData = data; 
+                    calistirKDS(data, 0); 
+                })
+                .catch(err => {
+                    console.error("Hata:", err);
+                    document.getElementById('inventory-table-body').innerHTML = 
+                        `<tr><td colspan="5" class="text-center text-red-500 py-4 font-bold">Veritabanına bağlanılamadı.</td></tr>`;
+                });
+
+            const slider = document.getElementById('whatIfSlider');
+            const sliderLabel = document.getElementById('scenarioValue');
+
+            if(slider) {
+                slider.addEventListener('input', function() {
+                    const val = parseInt(this.value);
+                    const isPositive = val > 0;
+                    sliderLabel.innerText = `%${val} (${val === 0 ? 'Normal' : (isPositive ? 'Artış' : 'Düşüş')})`;
+                    sliderLabel.className = `text-xs font-bold ${val === 0 ? 'text-blue-600' : (isPositive ? 'text-green-600' : 'text-red-600')}`;
+                    
+                    calistirKDS(globalData, val);
+                });
+            }
+
+            function calistirKDS(dbData, degisimYuzdesi) {
+                const tableBody = document.getElementById('inventory-table-body');
+                tableBody.innerHTML = "";
+
+                let toplamStokDegeri = 0;
+                let butceIhtiyaci = 0;
+                let stratejikUrun = 0;
+                let kategoriVerisi = {};
+                
+                const carpan = 1 + (degisimYuzdesi / 100); 
+
+                if(!dbData || dbData.length === 0) { tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center">Veri yok.</td></tr>`; return; }
+
+                dbData.forEach(kitap => {
+                    const stok = parseInt(kitap.stok);
+                    const maliyet = parseFloat(kitap.maliyet);
+                    const bazSatisHizi = parseFloat(kitap.satis_hizi || 0);
+                    const kategori = kitap.kategori || "Genel";
+
+                    const simuleSatisHizi = bazSatisHizi * carpan;
+
+                    toplamStokDegeri += (stok * maliyet);
+
+                    let altiAylikTalep = Math.ceil(simuleSatisHizi * 180);
+                    let stokFarki = stok - altiAylikTalep;
+
+                    let projeksiyonHTML, stratejiBadge, kararBtn, rowClass = "hover:bg-slate-50 border-b";
+
+                    if (stokFarki < -(altiAylikTalep * 0.5)) {
+                        let acik = Math.abs(stokFarki);
+                        let maliyetTahmini = acik * maliyet;
+                        butceIhtiyaci += maliyetTahmini;
+                        stratejikUrun++;
+
+                        rowClass = "bg-orange-50/50 border-b border-orange-100";
+                        projeksiyonHTML = `
+                            <div class="text-xs font-bold text-slate-600">Hedef: ${altiAylikTalep}</div>
+                            <div class="text-[9px] text-red-500 font-bold">Açık: -${Math.round(acik)}</div>
+                        `;
+                        stratejiBadge = `<span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Büyüme</span>`;
+                        kararBtn = `<button class="w-full bg-blue-600 text-white py-1.5 rounded text-[10px] font-bold hover:bg-blue-700 shadow-sm">₺${nFmt(maliyetTahmini)} Tedarik</button>`;
+                    }
+                    else if (stok > (simuleSatisHizi * 365) && simuleSatisHizi > 0) {
+                        projeksiyonHTML = `
+                            <div class="text-xs font-bold text-slate-600">Satış Çok Yavaş</div>
+                            <div class="text-[9px] text-orange-500 font-bold">1 Yıl+ Stok Var</div>
+                        `;
+                        stratejiBadge = `<span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Tasfiye</span>`;
+                        kararBtn = `<button class="w-full bg-purple-600 text-white py-1.5 rounded text-[10px] font-bold hover:bg-purple-700 shadow-sm">Kampanya Başlat</button>`;
+                    }
+                    else {
+                        projeksiyonHTML = `
+                            <div class="text-xs font-bold text-emerald-600">Dengeli</div>
+                            <div class="text-[9px] text-slate-400">Yıl sonuna kadar yeterli</div>
+                        `;
+                        stratejiBadge = `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase">İzle</span>`;
+                        kararBtn = `<span class="text-slate-400 text-[10px] text-center block">-</span>`;
+                    }
+
+                    tableBody.innerHTML += `
+                        <tr class="${rowClass}">
+                            <td class="px-4 py-3">
+                                <div class="font-bold text-slate-800">${kitap.ad}</div>
+                                <div class="text-[10px] text-slate-500">${kategori}</div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="font-bold text-slate-700">${stok} Adet</div>
+                                <div class="text-[9px] text-slate-400">Baz Hız: ${bazSatisHizi}</div>
+                            </td>
+                            <td class="px-4 py-3">${projeksiyonHTML}</td>
+                            <td class="px-4 py-3">${stratejiBadge}</td>
+                            <td class="px-4 py-3 text-right w-40">${kararBtn}</td>
+                        </tr>
+                    `;
+
+                    if(!kategoriVerisi[kategori]) kategoriVerisi[kategori] = 0;
+                    kategoriVerisi[kategori] += stok;
+                });
+
+                document.getElementById('kpi-total-value').innerText = "₺" + nFmt(toplamStokDegeri);
+                document.getElementById('kpi-budget-need').innerText = "₺" + nFmt(butceIhtiyaci);
+                document.getElementById('kpi-strategic-count').innerText = stratejikUrun;
+
+                cizGrafikler(kategoriVerisi);
+            }
+
+            function nFmt(num) {
+                return new Intl.NumberFormat('tr-TR', { maximumSignificantDigits: 3 }).format(num);
+            }
+
+            function cizGrafikler(kategoriVerisi) {
+                const labels = Object.keys(kategoriVerisi);
+                const data = Object.values(kategoriVerisi);
+                const ctxOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+
+                if(window.myChartABC) window.myChartABC.destroy();
+                window.myChartABC = new Chart(document.getElementById('chartABC'), { 
+                    type: 'doughnut', 
+                    data: { labels: ['A', 'B', 'C'], datasets: [{ data: [65, 25, 10], backgroundColor: ['#ea580c', '#3b82f6', '#94a3b8'], borderWidth: 0 }] }, 
+                    options: { ...ctxOpts, cutout: '70%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } 
+                });
+                
+                if(window.myChartShelf) window.myChartShelf.destroy();
+                window.myChartShelf = new Chart(document.getElementById('chartShelfLife'), { type: 'bar', data: { labels: labels.slice(0,4), datasets: [{ data: [15, 120, 200, 30], backgroundColor: (c)=>c.raw>180?'#ef4444':'#3b82f6', borderRadius: 4 }] }, options: { ...ctxOpts, scales: { x: { grid: {display:false} }, y: { display:false } } } });
+
+                if(window.myChartCat) window.myChartCat.destroy();
+                window.myChartCat = new Chart(document.getElementById('chartCategories'), { 
+                    type: 'doughnut', 
+                    data: { labels: labels, datasets: [{ data: data, backgroundColor: ['#f43f5e', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'], borderWidth: 0 }] }, 
+                    options: { ...ctxOpts, cutout: '65%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } 
+                });
+            }
+        });
+
+function updateScenario(val) {
+    const yuzde = parseInt(val); 
+    
+    const label = document.getElementById('scenarioValue');
+    if (label) {
+        label.innerText = `%${yuzde} (${yuzde > 0 ? 'Büyüme' : yuzde < 0 ? 'Daralma' : 'Stabil'})`;
+        label.style.color = yuzde > 0 ? "#059669" : (yuzde < 0 ? "#be123c" : "#374151");
+    }
+
+    if (window.myChartABC) {
+        let aPayi = 65 + (yuzde * 0.5); 
+        let cPayi = 10 - (yuzde * 0.2); 
+        
+        window.myChartABC.data.datasets[0].data = [Math.max(0, aPayi), 25, Math.max(0, cPayi)];
+        window.myChartABC.update('none'); 
+    }
+
+    if (window.myChartShelf) {
+        const riskCarpani = 1 - (yuzde / 100); 
+
+        const bazVeriler = [15, 120, 200, 30]; 
+
+        window.myChartShelf.data.datasets[0].data = bazVeriler.map(v => Math.max(0, Math.round(v * riskCarpani)));
+        
+        window.myChartShelf.data.datasets[0].backgroundColor = (c) => c.raw > 180 ? '#ef4444' : '#3b82f6';
+        
+        window.myChartShelf.update('none');
+    }
+
+    if (window.myChartCat) {
+        let mevcutData = window.myChartCat.data.datasets[0].data.slice();
+        
+        if (mevcutData.length > 0) {
+            let maxIndex = mevcutData.indexOf(Math.max(...mevcutData));
+            
+            mevcutData[maxIndex] = mevcutData[maxIndex] * (1 + (yuzde / 100));
+        }
+
+        window.myChartCat.data.datasets[0].data = mevcutData;
+        window.myChartCat.update('none');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const sliderID = "whatIfSlider"; 
+    const slider = document.getElementById(sliderID); 
+    const label = document.getElementById('scenarioValue'); 
+
+    if (!slider) {
+        console.error("HATA: Slider bulunamadı!");
+        return;
+    } else {
+        console.log("Sistem hazır: Slider ve Grafikler bağlandı.");
+    }
+
+    slider.addEventListener('input', function() {
+        const yuzde = parseInt(this.value); 
+        
+        if (label) {
+            label.innerText = `%${yuzde} (${yuzde > 0 ? 'Büyüme' : yuzde < 0 ? 'Daralma' : 'Normal'})`;
+            label.style.color = yuzde > 0 ? "#059669" : (yuzde < 0 ? "#be123c" : "#374151");
+        }
+
+        if (window.myChartABC) {
+            let a = 65 + (yuzde * 0.5); 
+            let c = 10 - (yuzde * 0.2);
+            window.myChartABC.data.datasets[0].data = [Math.max(0, a), 25, Math.max(0, c)];
+            window.myChartABC.update('none'); 
+        }
+
+        if (window.myChartShelf) {
+            const carpan = 1 - (yuzde / 100);
+            const bazVeriler = [15, 120, 200, 30]; 
+            window.myChartShelf.data.datasets[0].data = bazVeriler.map(v => Math.max(0, Math.round(v * carpan)));
+            window.myChartShelf.data.datasets[0].backgroundColor = (c) => c.raw > 180 ? '#ef4444' : '#3b82f6';
+            window.myChartShelf.update('none');
+        }
+
+        if (window.myChartCat) {
+            if (!window.myChartCat.originalData) {
+                window.myChartCat.originalData = [...window.myChartCat.data.datasets[0].data];
+            }
+
+            const yeniVeri = window.myChartCat.originalData.map((deger, index) => {
+                if (index === 0 || index === 1) {
+                    return Math.max(0, Math.round(deger * (1 + yuzde / 80))); 
+                } else if (index === window.myChartCat.originalData.length - 1) {
+                    return Math.max(0, Math.round(deger * (1 - yuzde / 100)));
+                } else {
+                    return deger;
+                }
+            });
+
+            window.myChartCat.data.datasets[0].data = yeniVeri;
+            window.myChartCat.update('none');
+        }
+    });
+});
+    </script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KDS | Talep Tahminleme</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #f1f5f9; color: #0f172a; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .brand-red { background-color: #be123c; } 
+        
+        .sidebar-link { color: #94a3b8; transition: all 0.2s; }
+        .sidebar-link:hover { color: white; background-color: rgba(255,255,255,0.05); }
+        .sidebar-active { 
+            color: #be123c !important; 
+            font-weight: 700; 
+            background-color: rgba(190, 18, 60, 0.1); 
+            border-right: 3px solid #be123c; 
+        }
+
+        .stat-card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); }
+        
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #be123c; cursor: pointer; margin-top: -6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #e2e8f0; border-radius: 2px; }
+    </style>
+</head>
+<body class="flex h-screen">
+
+    <aside class="w-64 bg-[#1e293b] flex flex-col flex-shrink-0 shadow-2xl z-50">
+        <div class="p-6 border-b border-slate-700 bg-[#0f172a]">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 brand-red rounded flex items-center justify-center text-white"><i class="fa-solid fa-chart-pie"></i></div>
+                <h1 class="text-white font-bold text-lg tracking-tight">Kırmızı Kedi Kitabevi KDS</h1>
+            </div>
+        </div>
+        <nav class="flex-1 mt-6 px-4 space-y-1 overflow-y-auto">
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 mt-2 italic">Mevcut Varlıklar</p>
+            <a href="subeler.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link"><i class="fa-solid fa-store w-5 text-center"></i> Şubelerim</a>
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 mt-6 italic">Büyüme Analizi</p>
+            <a href="LokasyonAnalizi.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link"><i class="fa-solid fa-location-crosshairs w-5 text-center"></i> Lokasyon Analizi</a>
+            <a href="talep.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link sidebar-active"><i class="fa-solid fa-arrow-trend-up w-5 text-center"></i> Talep Analizi</a>
+            <a href="pazarlama.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link"><i class="fa-solid fa-bullseye w-5 text-center"></i> Pazarlama Stratejisi</a>
+            <a href="envanter.html" class="flex items-center gap-3 px-3 py-3 text-sm rounded sidebar-link"><i class="fa-solid fa-warehouse w-5 text-center"></i> Envanter Yönetimi</a>
+            
+        </nav>
+        <div class="p-4 bg-[#0f172a] border-t border-slate-700">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white text-xs font-bold">YO</div>
+                <div><p class="text-xs text-white font-bold">Yönetici Oturumu</p><p class="text-[10px] text-slate-400">Veritabanı: Online</p></div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-10 bg-[#f8fafc]">
+        
+        <header class="mb-8 border-b border-slate-200 pb-6 flex justify-between items-end">
+            <div>
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Talep Tahminleme & Trend Simülasyonu</h2>
+                <p class="text-slate-500 mt-1 text-sm">Gelecek 6 aylık dönem için "What-If" (Senaryo) bazlı satış öngörüsü.</p>
+            </div>
+            <span class="px-3 py-1 bg-white border text-xs font-bold text-slate-500 rounded shadow-sm">Tablo: <span class="font-mono text-brand-red">talep_tahminleri</span></span>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            
+            <div class="stat-card p-6 flex flex-col gap-6 h-fit">
+                
+                <div>
+                    <h4 class="text-xs font-bold text-slate-800 uppercase mb-2 flex items-center gap-2"><i class="fa-solid fa-layer-group text-slate-400"></i> Kategori Seçimi</h4>
+                    <select id="categorySelect" class="w-full bg-slate-50 border border-slate-300 text-sm font-bold py-2 px-3 rounded outline-none focus:border-brand-red" onchange="updateChart()">
+                        <option value="roman">Edebiyat & Roman</option>
+                        <option value="egitim">Eğitim & Sınav</option>
+                        <option value="cocuk">Çocuk Kitapları</option>
+                    </select>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-xs font-bold text-brand-red uppercase flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Trend Etkisi</h4>
+                        <span id="trend-badge" class="px-2 py-1 bg-slate-200 text-slate-600 text-[10px] font-bold rounded">%0</span>
+                    </div>
+                    <input type="range" id="trendSlider" min="-50" max="50" value="0" step="5" class="w-full mb-2" oninput="updateChart()">
+                    <div class="flex justify-between text-[9px] text-slate-400 font-bold uppercase"><span>Düşüş</span><span>Mevcut</span><span>Patlama</span></div>
+                    <p class="text-[10px] text-slate-500 mt-3 italic leading-relaxed">
+                        <i class="fa-solid fa-circle-info mr-1"></i> "Dış etkenleri (örn. Sınav Takvimi değişimi) simüle etmek için kullanın."
+                    </p>
+                </div>
+
+                <div class="border-t pt-4">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">6 Aylık Tahmin</p>
+                    <h3 id="total-forecast" class="text-3xl font-black text-slate-800 mt-1">-- Adet</h3>
+                    <p id="total-diff" class="text-xs font-bold mt-1 text-slate-400">Değişim yok.</p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 stat-card p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-800">Talep Projeksiyonu</h3>
+                    <div class="flex gap-4 text-[10px] font-bold uppercase">
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-800"></span> Geçmiş</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-cbd5e1"></span> Baz Tahmin</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-brand-red"></span> Simülasyon</span>
+                    </div>
+                </div>
+                <div class="h-[320px]"><canvas id="forecastChart"></canvas></div>
+            </div>
+        </div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h3 class="font-bold text-slate-700">Kategori Portföy Matrisi</h3>
+                <p class="text-xs text-slate-500">Büyüme hızı ve pazar payına göre simülasyon konumu.</p>
+            </div>
+            <span class="px-2 py-1 bg-slate-100 text-slate-600 text-xs rounded border border-slate-200">BCG Analizi</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div id="card-yildiz" class="p-4 rounded-lg border border-slate-200 bg-slate-50 opacity-50 transition-all duration-300">
+                <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-bold text-emerald-800">Yıldız</h4>
+                    <span class="px-1.5 py-0.5 bg-emerald-200 text-emerald-800 text-[10px] font-bold rounded">YÜKSEK BÜYÜME</span>
+                </div>
+                <div class="text-3xl font-black text-emerald-600 mb-1" id="text-yildiz-oran">%0</div>
+                <p class="text-xs text-emerald-700">Yatırım Yap & Büyüt</p>
+            </div>
+
+            <div id="card-inek" class="p-4 rounded-lg border-2 border-blue-500 bg-blue-50 transition-all duration-300 shadow-md transform scale-105">
+                <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-bold text-blue-800">Nakit İneği</h4>
+                    <span class="px-1.5 py-0.5 bg-blue-200 text-blue-800 text-[10px] font-bold rounded">STABİL</span>
+                </div>
+                <div class="text-3xl font-black text-blue-600 mb-1" id="text-inek-oran">%0</div>
+                <p class="text-xs text-blue-700">Nakiti Koru & Verim Al</p>
+            </div>
+
+            <div id="card-soru" class="p-4 rounded-lg border border-slate-200 bg-slate-50 opacity-50 transition-all duration-300">
+                <div class="flex justify-between items-start mb-2">
+                    <h4 class="font-bold text-orange-800">Soru İşareti</h4>
+                    <span class="px-1.5 py-0.5 bg-orange-200 text-orange-800 text-[10px] font-bold rounded">RİSKLİ</span>
+                </div>
+                <div class="text-3xl font-black text-orange-600 mb-1" id="text-soru-oran">%0</div>
+                <p class="text-xs text-orange-700">Analiz Et & Karar Ver</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold text-slate-700">Senaryo Etkileri</h3>
+            <span class="text-xs text-slate-400">Tahmini KPI Değişimi</span>
+        </div>
+
+        <div class="mb-5">
+            <div class="flex justify-between text-sm mb-1">
+                <span class="text-slate-600 font-medium">Talep Hacmi</span>
+                <span id="txt-hacim" class="font-bold text-slate-800">%0</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div id="bar-hacim" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 50%"></div>
+            </div>
+        </div>
+
+        <div class="mb-5">
+            <div class="flex justify-between text-sm mb-1">
+                <span class="text-slate-600 font-medium">Operasyonel Yük</span>
+                <span id="txt-yuk" class="font-bold text-slate-800">%0</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div id="bar-yuk" class="bg-orange-400 h-2.5 rounded-full transition-all duration-500" style="width: 50%"></div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-1">Lojistik ve depo efor artışı.</p>
+        </div>
+
+        <div>
+            <div class="flex justify-between text-sm mb-1">
+                <span class="text-slate-600 font-medium">Talep Verimliliği</span>
+                <span id="txt-verim" class="font-bold text-slate-800">%0</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div id="bar-verim" class="bg-blue-500 h-2.5 rounded-full transition-all duration-500" style="width: 50%"></div>
+            </div>
+            <p id="txt-verim-uyari" class="text-[10px] text-red-500 mt-1 hidden">UYARI: Maliyet artışı verimliliği düşürüyor.</p>
+        </div>
+    </div>
+</div>
+
+<div id="action-card" class="stat-card p-6 border-l-4 border-slate-300 bg-white transition-all duration-300 mb-8 rounded-lg shadow-sm">
+    <div class="flex items-start gap-4">
+        <div id="action-icon" class="w-12 h-12 rounded bg-slate-200 flex items-center justify-center text-slate-500 text-xl flex-shrink-0">
+            <i class="fa-solid fa-gavel"></i>
+        </div>
+        
+        <div>
+            <h4 class="font-bold text-slate-700 mb-1">STRATEJİK KARAR ÖNERİSİ</h4>
+            <div id="action-text" class="text-slate-600 text-sm">
+                Simülasyon değerleri normal seyrinde. Mevcut stratejik plana sadık kalınabilir.
+            </div>
+        </div>
+    </div>
+</div>
+
+    </main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('forecastChart').getContext('2d');
+    let chartInstance = null;
+    const labels = ['Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara', 'Oca (T)', 'Şub (T)', 'Mar (T)', 'Nis (T)', 'May (T)', 'Haz (T)'];
+
+    let dataLibrary = {}; 
+
+    async function initPage() {
+        try {
+            const res = await fetch('http://localhost:3000/api/kategoriler');
+            const data = await res.json();
+            
+            console.log("Veritabanından Gelen Veri:", data);
+
+            const select = document.getElementById('categorySelect');
+            select.innerHTML = ''; 
+
+            data.forEach((cat, index) => {
+                
+                let ad = cat.tur_adi || cat.kategori_adi || cat.ad || cat.name || cat.Name || "Kategori";
+
+                let safeId = index; 
+
+                let option = document.createElement("option");
+                option.value = safeId; 
+                option.text = ad;
+                select.appendChild(option);
+
+                let baz = 500 + (index * 150); 
+                
+                dataLibrary[safeId] = { 
+                    past: [baz, baz+50, baz-20, baz+80, baz+120, baz+150], 
+                    future: [baz+200, baz+250, baz+300, baz+350, baz+400, baz+450] 
+                };
+            });
+
+            select.selectedIndex = 0; 
+            initChart();
+
+        } catch (error) {
+            console.error("HATA:", error);
+        }
+    }
+
+    function initChart() {
+        if(chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: { labels: labels, datasets: [
+                { label: 'Geçmiş', data: [], borderColor: '#1e293b', backgroundColor: '#1e293b', borderWidth: 2, tension: 0.4, pointRadius: 3 },
+                { label: 'Baz Tahmin', data: [], borderColor: '#cbd5e1', backgroundColor: '#cbd5e1', borderWidth: 2, borderDash: [5, 5], tension: 0.4, pointRadius: 0 },
+                { label: 'Simülasyon', data: [], borderColor: '#be123c', backgroundColor: '#be123c', borderWidth: 3, tension: 0.4, pointRadius: 4 }
+            ]},
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } }, animation: { duration: 400 } }
+        });
+        updateChart();
+    }
+
+    function updateChart() {
+        const id = document.getElementById('categorySelect').value; 
+        const trend = parseInt(document.getElementById('trendSlider').value);
+        
+        const data = dataLibrary[id]; 
+
+        if (!data) {
+            console.log("Veri bulunamadı ID:", id); 
+            return;
+        }
+
+        const simulated = data.future.map(val => Math.round(val * (1 + trend / 100)));
+        const padding = Array(6).fill(null);
+        
+        chartInstance.data.datasets[0].data = data.past.concat(padding);
+        chartInstance.data.datasets[1].data = padding.concat(data.future);
+        chartInstance.data.datasets[2].data = padding.concat(simulated);
+        chartInstance.options.scales.y.max = Math.round(Math.max(...data.past, ...data.future) * 1.8);
+        
+        let color = trend > 0 ? '#10b981' : (trend < 0 ? '#ef4444' : '#be123c');
+        chartInstance.data.datasets[2].borderColor = color;
+        chartInstance.data.datasets[2].backgroundColor = color;
+        
+        chartInstance.update();
+        updateStats(trend, simulated, data.future);
+    }
+
+function updateStats(trend, sim, base) {
+        updateStrategyMessage(trend);
+        const totalSim = sim.reduce((a, b) => a + b, 0);
+        const totalBase = base.reduce((a, b) => a + b, 0);
+        const diff = totalSim - totalBase;
+
+        document.getElementById('total-forecast').innerText = Math.floor(totalSim).toLocaleString('tr-TR') + " Adet";
+        document.getElementById('trend-badge').innerText = (trend > 0 ? "+" : "") + trend + "%";
+        
+        const diffEl = document.getElementById('total-diff');
+        if(diff > 0) diffEl.innerHTML = `<span class="text-emerald-600">+${Math.floor(diff).toLocaleString()}</span> (Artış)`;
+        else if (diff < 0) diffEl.innerHTML = `<span class="text-red-600">${Math.floor(diff).toLocaleString()}</span> (Düşüş)`;
+        else diffEl.innerHTML = `<span class="text-slate-500">Değişim Yok</span>`;
+
+        let hacimYuzde = 50 + (trend * 1.5); 
+        hacimYuzde = Math.min(Math.max(hacimYuzde, 5), 100);
+        
+        document.getElementById('txt-hacim').innerText = (trend > 0 ? "+" : "") + trend + "%";
+        document.getElementById('bar-hacim').style.width = hacimYuzde + "%";
+
+        let yukYuzde = trend * 0.8;
+        document.getElementById('txt-yuk').innerText = (yukYuzde > 0 ? "+" : "") + yukYuzde.toFixed(1) + "%";
+        document.getElementById('bar-yuk').style.width = Math.min(Math.max(50 + yukYuzde, 5), 100) + "%";
+
+        let verimYuzde = trend * -0.3; 
+        let verimBarWidth = 70 + verimYuzde; 
+        
+        document.getElementById('txt-verim').innerText = (verimYuzde > 0 ? "+" : "") + verimYuzde.toFixed(1) + "%";
+        document.getElementById('bar-verim').style.width = Math.min(Math.max(verimBarWidth, 5), 100) + "%";
+        
+        if(trend > 30) document.getElementById('txt-verim-uyari').classList.remove('hidden');
+        else document.getElementById('txt-verim-uyari').classList.add('hidden');
+
+        updateMatrixCards(trend);
+
+        updateStrategyMessage(trend);
+    }
+
+    function updateMatrixCards(trend) {
+        const kartlar = ['card-yildiz', 'card-inek', 'card-soru'];
+        kartlar.forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.className = "p-4 rounded-lg border border-slate-200 bg-slate-50 opacity-40 transition-all duration-300 grayscale";
+            }
+        });
+
+        document.getElementById('text-yildiz-oran').innerText = "%" + (trend > 0 ? trend : 0);
+        document.getElementById('text-inek-oran').innerText = "%" + Math.abs(trend); 
+        document.getElementById('text-soru-oran').innerText = "%" + (trend < 0 ? Math.abs(trend) : 0);
+
+        let aktifID = 'card-inek'; 
+        let renk = 'blue';
+
+        if (trend >= 15) {
+            aktifID = 'card-yildiz';
+            renk = 'emerald';
+        } else if (trend <= -15) {
+            aktifID = 'card-soru';
+            renk = 'orange';
+        }
+
+        const aktifKart = document.getElementById(aktifID);
+        if(aktifKart) {
+            aktifKart.className = `p-4 rounded-lg border-2 border-${renk}-500 bg-${renk}-50 transition-all duration-300 shadow-md transform scale-105 opacity-100`;
+        }
+    }
+
+    window.onload = initPage;
+    function updateStrategyMessage(trend) {
+        const card = document.getElementById('action-card');
+        const icon = document.getElementById('action-icon');
+        const text = document.getElementById('action-text');
+
+        if (!card || !icon || !text) return;
+
+        if (trend >= 15) {
+            card.className = "stat-card p-6 border-l-4 border-emerald-500 bg-emerald-50 transition-all duration-300 mb-8 rounded-lg shadow-sm";
+            icon.className = "w-12 h-12 rounded bg-emerald-200 flex items-center justify-center text-emerald-700 text-xl flex-shrink-0";
+            icon.innerHTML = '<i class="fa-solid fa-truck-fast"></i>';
+            text.innerHTML = `<strong>Acil Tedarik Stratejisi:</strong> Talep artışı (%${trend}) kapasiteyi zorlayacak. "Hızlı Teslimat" anlaşmalarını devreye alın.`;
+        } else if (trend <= -15) {
+            card.className = "stat-card p-6 border-l-4 border-red-500 bg-red-50 transition-all duration-300 mb-8 rounded-lg shadow-sm";
+            icon.className = "w-12 h-12 rounded bg-red-200 flex items-center justify-center text-red-700 text-xl flex-shrink-0";
+            icon.innerHTML = '<i class="fa-solid fa-percent"></i>';
+            text.innerHTML = `<strong>Stok Optimizasyon:</strong> Ciddi düşüş (%${Math.abs(trend)}) var. Maliyeti kısmak için promosyonlu satış başlatın.`;
+        } else {
+            card.className = "stat-card p-6 border-l-4 border-slate-300 bg-white transition-all duration-300 mb-8 rounded-lg shadow-sm";
+            icon.className = "w-12 h-12 rounded bg-slate-200 flex items-center justify-center text-slate-500 text-xl flex-shrink-0";
+            icon.innerHTML = '<i class="fa-solid fa-gavel"></i>';
+            text.innerHTML = "Simülasyon değerleri normal seyrinde. Mevcut stratejik plana sadık kalınabilir.";
+        }
+    }
+</script>
+</body>
+</html>
