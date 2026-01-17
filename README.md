@@ -23,9 +23,11 @@ Proje, yöneticilerin şube performanslarını izlemesi, stratejik pazarlama kar
 * **Simülasyon Modu:** Pazarlama bütçesi (Slider) ile oynayarak tahmini ROI (Yatırım Getirisi) ve Ciro artışının hesaplanması.
 * Yapay zeka destekli kampanya önerileri.
 
-### 4. 📦 Envanter ve Stok Yönetimi
+### 4. 📦 Envanter ve Stok Yönetimi (CRUD)
 * Kritik stok seviyesine düşen kitapların tespiti.
 * Kategori bazlı stok maliyeti ve satış hızı analizi.
+* **Veritabanı İşlemleri:** Arayüz üzerinden anlık olarak **Yeni Stok Ekleme (Create)** ve **Ürün Silme (Delete)** işlemleri yapılabilir.
+* Stok verileri veritabanı (`sube_stoklari`) ile tam senkronize çalışır.
 
 ---
 
@@ -57,10 +59,10 @@ Projeyi kendi bilgisayarınızda çalıştırmak için:
 
 3.  **Veritabanını Kurun:**
     * MySQL'de `kirmizi_kedi_kds` adında bir veritabanı oluşturun.
-    * `/database/kirmizi_kedi_kds.sql` dosyasını içe aktarın (Import).
+    * Ana dizindeki `.sql` uzantılı veritabanı dosyasını (Import) edin.
 
 4.  **Çevresel Değişkenleri Ayarlayın:**
-    * `.env.example` dosyasının adını `.env` olarak değiştirin.
+    * `.env` dosyasını oluşturun.
     * İçindeki DB bilgilerini (Kullanıcı adı, Şifre) kendi bilgisayarınıza göre düzenleyin.
 
 5.  **Projeyi Başlatın:**
@@ -83,6 +85,15 @@ Proje aşağıdaki RESTful uç noktaları sağlar:
 | `GET` | `/api/satis-grafik/:id` | 6 aylık satış projeksiyonu sunar. |
 | `GET` | `/api/harita-verisi` | Lokasyon analizi için GeoJSON ve Puan verilerini birleştirir. |
 | `GET` | `/api/pazarlama-analiz/:id` | Müşteri segmentasyonu ve kampanya simülasyon verisi. |
+| `GET` | `/api/envanter` | Tüm stok listesini (Read) getirir. |
+| `POST` | `/api/envanter-ekle` | Yeni stok kaydı oluşturur (Create). |
+| `DELETE` | `/api/envanter-sil/:id` | Stok kaydını veritabanından siler (Delete). |
+
+---
+
+## 🗄️ Veritabanı Şeması (ER Diyagramı)
+
+Projenin veritabanı ilişkilerini gösteren **ER Diyagramı**, proje ana dizininde `ER_Diyagrami.png` dosyası olarak mevcuttur.
 
 ---
 
