@@ -272,3 +272,31 @@ exports.getEnvanter = async (req, res) => {
         res.status(500).json({ error: "Veritabanı hatası" });
     }
 };
+
+exports.urunEkle = async (req, res) => {
+    // sube_stoklari tablosuna uygun sütunlar
+    const { sube_id, tur_id, mevcut_stok, kritik_esik } = req.body;
+    try {
+        const query = `
+            INSERT INTO sube_stoklari (sube_id, tur_id, mevcut_stok, kritik_esik) 
+            VALUES (?, ?, ?, ?)
+        `;
+        const [result] = await db.query(query, [sube_id, tur_id, mevcut_stok, kritik_esik]);
+        res.json({ message: "Stok başarıyla eklendi", id: result.insertId });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Ekleme hatası" });
+    }
+};
+
+
+exports.urunSil = async (req, res) => {
+    const { id } = req.params; // stok_id üzerinden siler
+    try {
+        await db.query('DELETE FROM sube_stoklari WHERE stok_id = ?', [id]);
+        res.json({ message: "Stok kaydı silindi" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Silme hatası" });
+    }
+};

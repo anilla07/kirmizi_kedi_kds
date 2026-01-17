@@ -24,6 +24,8 @@ router.get('/harita-subeler', kdsController.getHaritaSubeler);
 router.get('/kategoriler', kdsController.getKategoriler);
 router.get('/pazarlama-analiz/:id', kdsController.getPazarlamaAnaliz);
 router.get('/tum-subeler-ozet', kdsController.tumSubelerOzetGetir);
+router.post('/envanter-ekle', kdsController.urunEkle);
+router.delete('/envanter-sil/:id', kdsController.urunSil);
 
 // YENİ DÜZELTME: Artık SQL burada değil, controller'da!
 router.get('/envanter', kdsController.getEnvanter);
