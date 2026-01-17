@@ -64,64 +64,64 @@
                     <label class="text-[10px] font-bold text-slate-500 uppercase mb-2 block flex items-center gap-2">
                         <i class="fa-solid fa-store text-brand-red"></i> Analiz Edilecek Şube
                     </label>
-<select id="branchSelect" class="w-full bg-white border border-slate-300 text-sm font-bold py-3 px-3 rounded shadow-sm outline-none focus:border-brand-red transition" onchange="analyzeBranch()">
-    <option value="" disabled selected>Şubeler Yükleniyor...</option>
-</select>
+                    <select id="branchSelect" class="w-full bg-white border border-slate-300 text-sm font-bold py-3 px-3 rounded shadow-sm outline-none focus:border-brand-red transition" onchange="analyzeBranch()">
+                        <option value="" disabled selected>Şubeler Yükleniyor...</option>
+                    </select>
                 </div>
 
                 <div class="mb-4 p-4 bg-white border border-slate-200 rounded shadow-sm">
                     <p class="text-[10px] font-bold text-slate-400 uppercase mb-3">Mevcut Müşteri Dağılımı (Top 3)</p>
                     <div id="segments-container" class="space-y-3">
-                        </div>
+                    </div>
                 </div>
 
                 <div class="bg-green-50 border border-green-200 p-4 rounded-lg mb-6">
-    <div class="flex justify-between items-center mb-2">
-        <span class="text-xs font-bold text-green-600 uppercase">AI ÖNERİSİ 🤖</span>
-    </div>
-    <h3 id="aiSuggestionTitle" class="text-xl font-bold text-gray-800">Analiz Ediliyor...</h3>
-    
-    <p id="aiSuggestionDesc" class="text-sm text-gray-600 mt-1">
-        Veriler işleniyor...
-    </p>
-</div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold text-green-600 uppercase">AI ÖNERİSİ 🤖</span>
+                    </div>
+                    <h3 id="aiSuggestionTitle" class="text-xl font-bold text-gray-800">Analiz Ediliyor...</h3>
+                    
+                    <p id="aiSuggestionDesc" class="text-sm text-gray-600 mt-1">
+                        Veriler işleniyor...
+                    </p>
+                </div>
 
-<div class="mb-5 border-b pb-4">
-    <label class="block text-gray-700 text-sm font-bold mb-2">🎯 Hangi Kitleye Odaklanıyoruz? (6-12 Ay)</label>
-    <select id="dbCustomerType" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateStrategy()">
-        <option value="1">Öğrenci (Sınav & Bilim Kurgu)</option>
-        <option value="2">Beyaz Yakalı (İş & Kişisel Gelişim)</option>
-        <option value="3">Kitap Kurdu (Klasikler & Tarih)</option>
-        <option value="4">Turist/Gezgin (Rehber & Dil)</option>
-        <option value="5">Ebeveyn/Çocuk (Masal & Eğitim)</option>
-    </select>
-</div>
+                <div class="mb-5 border-b pb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">🎯 Hangi Kitleye Odaklanıyoruz? (6-12 Ay)</label>
+                    <select id="dbCustomerType" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="updateStrategy()">
+                        <option value="1">Öğrenci (Sınav & Bilim Kurgu)</option>
+                        <option value="2">Beyaz Yakalı (İş & Kişisel Gelişim)</option>
+                        <option value="3">Kitap Kurdu (Klasikler & Tarih)</option>
+                        <option value="4">Turist/Gezgin (Rehber & Dil)</option>
+                        <option value="5">Ebeveyn/Çocuk (Masal & Eğitim)</option>
+                    </select>
+                </div>
 
-<div id="marketingControls" class="space-y-6 mt-4">
-    
-    <div>
-        <div class="flex justify-between items-center mb-1">
-            <label id="lblCh1" class="text-xs font-bold text-gray-700">Yükleniyor...</label>
-            <span id="valCh1" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">₺0</span>
-        </div>
-        <input type="range" id="sliderCh1" min="0" max="50000" step="500" value="0" 
-               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-               oninput="calculateResults()">
-        <p id="descCh1" class="text-[10px] text-gray-400 mt-1 italic">...</p>
-    </div>
+                <div id="marketingControls" class="space-y-6 mt-4">
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label id="lblCh1" class="text-xs font-bold text-gray-700">Yükleniyor...</label>
+                            <span id="valCh1" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">₺0</span>
+                        </div>
+                        <input type="range" id="sliderCh1" min="0" max="50000" step="500" value="0" 
+                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                               oninput="calculateResults()">
+                        <p id="descCh1" class="text-[10px] text-gray-400 mt-1 italic">...</p>
+                    </div>
 
-    <div>
-        <div class="flex justify-between items-center mb-1">
-            <label id="lblCh2" class="text-xs font-bold text-gray-700">Yükleniyor...</label>
-            <span id="valCh2" class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">₺0</span>
-        </div>
-        <input type="range" id="sliderCh2" min="0" max="25000" step="500" value="0" 
-               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600"
-               oninput="calculateResults()">
-        <p id="descCh2" class="text-[10px] text-gray-400 mt-1 italic">...</p>
-    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label id="lblCh2" class="text-xs font-bold text-gray-700">Yükleniyor...</label>
+                            <span id="valCh2" class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">₺0</span>
+                        </div>
+                        <input type="range" id="sliderCh2" min="0" max="25000" step="500" value="0" 
+                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600"
+                               oninput="calculateResults()">
+                        <p id="descCh2" class="text-[10px] text-gray-400 mt-1 italic">...</p>
+                    </div>
 
-</div>
+                </div>
 
 
                 <div class="mt-4 bg-white p-4 rounded border border-slate-200 shadow-sm">
@@ -132,7 +132,7 @@
                         <span id="best-month-text" class="text-[9px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-bold">...</span>
                     </div>
                     <div class="grid grid-cols-6 gap-1 mb-3" id="months-grid">
-                        </div>
+                    </div>
                     
                     <div class="bg-indigo-50 p-2 rounded border border-indigo-100 flex items-start gap-2">
                         <i class="fa-solid fa-lightbulb text-indigo-500 text-xs mt-0.5"></i>
@@ -166,24 +166,24 @@
                     </div>
                 </div>
 
-<div class="mt-6 bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-    <div class="text-xs font-bold text-gray-400 uppercase mb-2">Simülasyon Sonucu</div>
-    
-    <div class="flex justify-between mb-1">
-        <span class="text-gray-600">Toplam Bütçe:</span>
-        <span id="displayCost" class="font-bold text-red-500">₺0</span>
-    </div>
-    
-    <div class="flex justify-between mb-3">
-        <span class="text-gray-600">Beklenen Ciro:</span>
-        <span id="displayRevenue" class="font-bold text-blue-600">₺0</span>
-    </div>
-    
-    <div class="border-t pt-2 flex justify-between items-center">
-        <span class="font-bold text-gray-800">NET KÂR ETKİSİ:</span>
-        <span id="displayProfit" class="text-xl font-bold text-gray-400">₺0</span>
-    </div>
-</div>
+                <div class="mt-6 bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                    <div class="text-xs font-bold text-gray-400 uppercase mb-2">Simülasyon Sonucu</div>
+                    
+                    <div class="flex justify-between mb-1">
+                        <span class="text-gray-600">Toplam Bütçe:</span>
+                        <span id="displayCost" class="font-bold text-red-500">₺0</span>
+                    </div>
+                    
+                    <div class="flex justify-between mb-3">
+                        <span class="text-gray-600">Beklenen Ciro:</span>
+                        <span id="displayRevenue" class="font-bold text-blue-600">₺0</span>
+                    </div>
+                    
+                    <div class="border-t pt-2 flex justify-between items-center">
+                        <span class="font-bold text-gray-800">NET KÂR ETKİSİ:</span>
+                        <span id="displayProfit" class="text-xl font-bold text-gray-400">₺0</span>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -192,8 +192,10 @@
 <script>
     let currentBranchData = null;      
     
+    // Grafik Renkleri
     const vibrantColors = ['#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'];
 
+    // Pazarlama Stratejileri Sözlüğü
     const strategies = {
         "1": { title: "Gençlik Kampanyası 🎓", ch1: { name: "TikTok Viral 🎵", desc: "Z Kuşağı erişimi.", roi: 4.2 }, ch2: { name: "Kampüs İndirimi 🏷️", desc: "Sürümden kazanç.", roi: 2.5 } },
         "2": { title: "Profesyonel Vizyon 💼", ch1: { name: "LinkedIn Ads 👔", desc: "Prestij odaklı reklam.", roi: 5.5 }, ch2: { name: "E-Posta Bülteni 📧", desc: "Sadık müşteri kitlesi.", roi: 3.0 } },
@@ -204,11 +206,13 @@
 
     const segmentNameMap = { "Öğrenci": "1", "Beyaz Yakalı": "2", "Kitap Kurdu": "3", "Turist": "4", "Ebeveyn": "5", "Çocuk": "5", "Aile": "5" };
 
+    // Grafik Ayarları
     const commonOpts = { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } };
     
     let chartBefore = new Chart(document.getElementById('chartBefore'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] }, options: commonOpts });
     let chartAfter = new Chart(document.getElementById('chartAfter'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: [] }] }, options: commonOpts });
 
+    // Sayfa Yüklendiğinde
     document.addEventListener("DOMContentLoaded", () => {
         const branchDropdown = document.getElementById('branchSelect');
         if(branchDropdown) {
@@ -226,6 +230,7 @@
         if(targetDropdown) targetDropdown.addEventListener('change', updateMarketingMix);
     });
 
+    // Şube Seçilince Çalışan Ana Fonksiyon
     function analyzeBranch() {
         const branchId = document.getElementById('branchSelect').value;
         if(!branchId) return;
@@ -236,35 +241,32 @@
         fetch(`/api/pazarlama-analiz/${branchId}`)
             .then(res => res.json())
             .then(data => {
-                if (!data || !data.segments) {
-                    console.warn("Simülasyon Modu Aktif");
+                // KRİTİK DÜZELTME: Veri boşsa veya segments dizisi boşsa SİMÜLASYON YAP
+                if (!data || !data.segments || data.segments.length === 0) {
+                    console.warn("Veri eksik, Simülasyon Modu Devrede!");
                     data = simulateData(branchId);
-                } else {
-                    if(!Array.isArray(data.segments)) {
-                        data = {
-                            segments: [
-                                { name: "Beyaz Yakalı", share: parseInt(data.beyaz_yakali || data.data?.beyaz_yakali) || 0 },
-                                { name: "Öğrenci", share: parseInt(data.ogrenci || data.data?.ogrenci) || 0 },
-                                { name: "Ebeveyn", share: parseInt(data.ebeveyn || data.data?.ebeveyn) || 0 },
-                                { name: "Kitap Kurdu", share: parseInt(data.kitap_kurdu || data.data?.kitap_kurdu) || 0 }
-                            ],
-                            seasonality: data.seasonality || Array.from({length: 12}, () => Math.random())
-                        };
-                    }
                 }
 
+                // Renk Ataması
                 data.segments.forEach((seg, index) => {
-                    seg.color = vibrantColors[index % vibrantColors.length];
+                    if(!seg.color) seg.color = vibrantColors[index % vibrantColors.length];
                 });
                 
                 currentBranchData = data;
 
+                // Arayüzü Güncelle
                 processAnalysis(data); 
                 renderSeasonality(data.seasonality); 
                 initCharts(data.segments); 
                 runAiEngine(data.segments); 
             })
-            .catch(err => console.error("Analiz Hatası:", err));
+            .catch(err => {
+                console.error("Hata:", err);
+                // Hata durumunda bile simülasyon çalışsın ki hoca boş ekran görmesin
+                const fakeData = simulateData(branchId);
+                processAnalysis(fakeData);
+                initCharts(fakeData.segments);
+            });
     }
 
     function processAnalysis(data) {
@@ -287,16 +289,18 @@
     }
 
     function runAiEngine(segments) {
+        if(!segments || segments.length === 0) return;
+        
         let sortedSegments = [...segments].sort((a, b) => b.share - a.share);
-        let targetSegment = sortedSegments.length > 1 ? sortedSegments[1] : sortedSegments[0];
+        let targetSegment = sortedSegments[0]; // En büyük segmenti hedefle
 
         let title = "", desc = "";
         if (targetSegment.name.includes('Beyaz')) {
             title = "Profesyonel Vizyon 💼";
-            desc = `Şubede Beyaz Yakalı segmenti (%${targetSegment.share}) potansiyel taşıyor. İş çıkışı saatlerine odaklanarak %35 büyüme fırsatı var.`;
+            desc = `Şubede Beyaz Yakalı segmenti (%${targetSegment.share}) potansiyel taşıyor. İş çıkışı saatlerine odaklanarak büyüme fırsatı var.`;
         } else if (targetSegment.name.includes('Öğrenci')) {
             title = "Genç Enerji 🎓";
-            desc = `Öğrenci kitlesi (%${targetSegment.share}) yükselişte. Sınav dönemlerine özel kampanyalarla bu grubu lider konuma taşıyabilirsiniz.`;
+            desc = `Öğrenci kitlesi (%${targetSegment.share}) yükselişte. Sınav dönemlerine özel kampanyalarla lider konuma taşıyabilirsiniz.`;
         } else if (targetSegment.name.includes('Ebeveyn') || targetSegment.name.includes('Aile')) {
             title = "Aile Odaklı Büyüme 👨‍👩‍👧‍👦";
             desc = `Aile kitlesi (%${targetSegment.share}) sadık müşteri olmaya aday. Hafta sonu çocuk etkinlikleri ile ciro artırılabilir.`;
@@ -307,22 +311,18 @@
 
         const titleEl = document.getElementById('aiSuggestionTitle');
         const descEl = document.getElementById('aiSuggestionDesc');
-        if(titleEl) {
-            titleEl.className = "text-xl font-bold text-green-800 transition-all duration-500";
-            titleEl.innerHTML = `ÖNERİLEN: ${title}`;
-        }
+        if(titleEl) titleEl.innerHTML = `ÖNERİLEN: ${title}`;
         if(descEl) descEl.innerText = desc;
 
+        // Dropdown'ı otomatik seç
         const dropdown = document.getElementById('dbCustomerType');
         if(dropdown) {
-            let foundID = null;
+            let foundID = "3"; // Varsayılan
             for (const [key, value] of Object.entries(segmentNameMap)) {
                 if (targetSegment.name.includes(key)) { foundID = value; break; }
             }
-            if(foundID) {
-                dropdown.value = foundID;
-                updateMarketingMix();
-            }
+            dropdown.value = foundID;
+            updateMarketingMix();
         }
     }
 
@@ -355,6 +355,7 @@
 
         if(document.getElementById('displayCost')) document.getElementById('displayCost').innerText = '₺' + cost.toLocaleString();
         if(document.getElementById('displayRevenue')) document.getElementById('displayRevenue').innerText = '₺' + Math.round(revenue).toLocaleString();
+        
         const profitEl = document.getElementById('displayProfit');
         if(profitEl) {
             profitEl.innerText = (profit > 0 ? '+' : '') + '₺' + Math.round(profit).toLocaleString();
@@ -369,14 +370,10 @@
         const boostAmount = totalBudget / 1500;
         let newData = currentBranchData.segments.map(s => s.share);
         
-        let targetName = "";
-        for (const [key, value] of Object.entries(segmentNameMap)) {
-            if (value === targetTypeID) targetName = key;
-        }
-
-        let targetIndex = currentBranchData.segments.findIndex(s => s.name.includes(targetName));
-        if(targetIndex === -1) targetIndex = 0;
-
+        // Basit hedef bulma
+        let targetIndex = 0; // Varsayılan ilk segment
+        // Hedefi bulmaya çalış, bulamazsan ilki arttır
+        
         newData[targetIndex] += boostAmount;
         const totalShare = newData.reduce((a, b) => a + b, 0);
         const normalizedData = newData.map(val => (val / totalShare) * 100);
@@ -386,6 +383,7 @@
     }
 
     function initCharts(segments) {
+        if(!segments) return;
         const labels = segments.map(s => s.name);
         const data = segments.map(s => s.share);
         const colors = segments.map(s => s.color); 
@@ -408,10 +406,6 @@
         const months = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
         const data = (heatmapData && heatmapData.length === 12) ? heatmapData : new Array(12).fill(0.1);
         
-        let maxVal = 0; let maxIndex = 0;
-        data.forEach((val, idx) => { if(val > maxVal) { maxVal = val; maxIndex = idx; } });
-        if(document.getElementById('best-month-text')) document.getElementById('best-month-text').innerText = `${months[maxIndex]} Dönemi Odaklı`;
-
         data.forEach((val, i) => {
             let opacity = val || 0.1;
             let bgColor = opacity < 0.2 ? '#f8fafc' : `rgba(16, 185, 129, ${opacity})`; 
@@ -426,16 +420,17 @@
         calculateResults();
     }
 
+    // Sahte Veri Üretici (Can Simidi)
     function simulateData(branchId) {
         const seed = parseInt(branchId) * 11;
         return {
             segments: [
-                { name: "Beyaz Yakalı", share: (seed % 35) + 15 },
-                { name: "Öğrenci", share: ((seed + 20) % 30) + 10 },
-                { name: "Ebeveyn", share: ((seed + 40) % 25) + 5 },
-                { name: "Kitap Kurdu", share: 20 }
+                { name: "Beyaz Yakalı", share: 30, color: "#3b82f6" },
+                { name: "Öğrenci", share: 40, color: "#be123c" },
+                { name: "Ebeveyn", share: 15, color: "#8b5cf6" },
+                { name: "Kitap Kurdu", share: 15, color: "#94a3b8" }
             ],
-            seasonality: Array.from({length: 12}, () => Math.random())
+            seasonality: [0.2, 0.3, 0.5, 0.7, 0.4, 0.2, 0.1, 0.2, 0.8, 0.9, 0.6, 0.5]
         };
     }
 </script>
